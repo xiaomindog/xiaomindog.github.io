@@ -69,8 +69,18 @@ categories: [hexo]
 
 - 注意：
 
-  完成更新后，```git pull```更新博客配置到GitHub上以备份。
+  如果更新了博客的配置，
 
+  ```shell
+git add . 
+  git commit -m "modify xxx"
+  git push
+  ```
   
-
+  
+  
+  更新博客配置到GitHub上以备份。
+  
+  
+  
   
