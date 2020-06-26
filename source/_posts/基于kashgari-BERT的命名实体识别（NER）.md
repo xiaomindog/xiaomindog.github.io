@@ -43,8 +43,7 @@ from kashgari.tasks.labeling import BiLSTM_CRF_Model, BiGRU_CRF_Model
 from kashgari.embeddings import BERTEmbedding, WordEmbedding
 
 BERT_PATH = './data/chinese_L-12_H-768_A-12'
-bert_embedding=BERTEmbedding(BERT_PATH,task=kashgari.LABELING,
-                             sequence_length=100)
+bert_embedding=BERTEmbedding(BERT_PATH,task=kashgari.LABELING,sequence_length=100)
 #如果加载wordembedding的词向量
 #word_embedding = WordEmbedding(embed_path, task=kashgari.LABELING, 								sequence_length=100)
 
@@ -56,7 +55,7 @@ bert_embedding=BERTEmbedding(BERT_PATH,task=kashgari.LABELING,
 model = BiLSTM_CRF_Model(embedding)
 
 model.fit(train_x, train_y,x_validate=val_x, y_validate=val_y,
-          epochs=40,batch_size=128) #参数可自行更改
+          epochs=40,batch_size=128)
 #如果没有开发集
 #model.fit(train_x, train_y,epochs=40,batch_size=128)
 
