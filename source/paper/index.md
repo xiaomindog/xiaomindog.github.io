@@ -9,11 +9,11 @@ type: 'paper'
 - [DMCNN]( https://www.aclweb.org/anthology/P15-1017.pdf ) - ACL2015 中科院
 
 - [HMEAE]( https://www.aclweb.org/anthology/D19-1584.pdf ) - EMNLP2019 清华
-- [Graph Convolutional Networks with Argument-Aware Pooling for Event Detection]( https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16329/16155 )- AAAI2018 GCN事件检测
+- [Graph Convolutional Networks with Argument-Aware Pooling for Event Detection]( https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16329/16155 ) -AAAI2018 GCN事件检测
 
 ##  阅读理解新范式
 
-- [The Natural Language Decathlon: Multitask Learning as Question Answering]( https://arxiv.org/pdf/1806.08730.pdf ) -stanford[ decaNLP ]( https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1194/slides/cs224n-2019-lecture17-multitask.pdf )
+- [ The Natural Language Decathlon: Multitask Learning as Question Answering ]( https://arxiv.org/pdf/1806.08730.pdf ) -stanford[ decaNLP ]( https://web.stanford.edu/class/archive/cs/cs224n/cs224n.1194/slides/cs224n-2019-lecture17-multitask.pdf )
 - [Entity-Relation Extraction as Multi-Turn Question Answering](https://www.aclweb.org/anthology/P19-1129.pdf) - ACL2019 香侬科技 多轮QA实体关系抽取
 - [ A Unified MRC Framework for Named Entity Recognition ]( https://arxiv.org/pdf/1910.11476.pdf ) - ACL2020香侬科技 MRC框架的NER
 - [Description Based Text Classifification with Reinforcement Learning ]( https://arxiv.org/abs/2002.03067 )-ICML2020香侬科技 基于类别描述的文本分类

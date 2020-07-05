@@ -77,10 +77,16 @@ git add .
   git push
   ```
   
-  
-  
   更新博客配置到GitHub上以备份。
   
   
   
+### 设置SSH使用hexo d时免输用户名密码
+
+- 参考：( https://blog.csdn.net/hhgggggg/article/details/77853665 )
+
+  
+
+  
+
   
