@@ -7,7 +7,6 @@ type: 'paper'
 ##  ACE事件
 
 - [DMCNN]( https://www.aclweb.org/anthology/P15-1017.pdf ) - ACL2015 中科院
-
 - [HMEAE]( https://www.aclweb.org/anthology/D19-1584.pdf ) - EMNLP2019 清华
 - [Graph Convolutional Networks with Argument-Aware Pooling for Event Detection]( https://www.aaai.org/ocs/index.php/AAAI/AAAI18/paper/view/16329/16155 ) -AAAI2018 GCN事件检测
 
