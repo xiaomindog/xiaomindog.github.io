@@ -1,5 +1,5 @@
 ---
-title: pathSum
+title: 路径总和问题
 date: 2020-07-05 17:10:09
 tags: [leetcode,递归,二叉树]
 categories: 'leetcode'
