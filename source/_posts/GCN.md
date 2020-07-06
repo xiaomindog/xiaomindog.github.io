@@ -1,8 +1,8 @@
 ---
 title: 初识图卷积网络
 date: 2020-01-08 22:23:59
-tags:[NLP,GCN,深度学习]
-categories:[GCN]
+tags: [NLP,GCN,深度学习]
+categories: [GCN]
 ---
 
 GCN的初学笔记

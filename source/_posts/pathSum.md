@@ -1,8 +1,8 @@
 ---
 title: pathSum
 date: 2020-07-05 17:10:09
-tags:[leetcode,递归，二叉树]
-categories:'leetcode'
+tags: [leetcode,递归，二叉树]
+categories: 'leetcode'
 ---
 
 关于leetcode中路径总和的几道题目的整理。
