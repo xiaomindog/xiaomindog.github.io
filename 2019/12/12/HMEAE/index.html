@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="论文地址： HMEAE: Hierarchical Modular Event Argument Extraction  摘要现有的事件提取方法将每个论元角色独立分类，而忽略了不同论元角色之间的概念相关性。本文提出了事件论元抽取HMEAE模型，以从事件论元角色的概念层次结构提供有效的归纳偏差。具体来说，我们为概念层次结构的每个基本单元设计了一个神经模块网络，然后将具有逻辑操作的相关单元模块按层次结">
+<meta name="keywords" content="NLP,paper">
+<meta property="og:type" content="article">
+<meta property="og:title" content="论文笔记之HMEAE">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;HMEAE&#x2F;index.html">
+<meta property="og:site_name" content="讲个笑话">
+<meta property="og:description" content="论文地址： HMEAE: Hierarchical Modular Event Argument Extraction  摘要现有的事件提取方法将每个论元角色独立分类，而忽略了不同论元角色之间的概念相关性。本文提出了事件论元抽取HMEAE模型，以从事件论元角色的概念层次结构提供有效的归纳偏差。具体来说，我们为概念层次结构的每个基本单元设计了一个神经模块网络，然后将具有逻辑操作的相关单元模块按层次结">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;HMEAE&#x2F;figure1.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;HMEAE&#x2F;model.png">
+<meta property="og:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;HMEAE&#x2F;result.png">
+<meta property="og:updated_time" content="2020-07-06T14:47:42.753Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2019&#x2F;12&#x2F;12&#x2F;HMEAE&#x2F;figure1.png">
+
+<link rel="canonical" href="http://yoursite.com/2019/12/12/HMEAE/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>论文笔记之HMEAE | 讲个笑话</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">讲个笑话</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">能力随心，自然成长</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-paper">
+
+    <a href="/paper/" rel="section"><i class="fa fa-fw fa-file-text"></i>论文</a>
+
+  </li>
+        <li class="menu-item menu-item-feeling">
+
+    <a href="/feeling/" rel="section"><i class="fa fa-fw fa-pencil"></i>随笔</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/12/HMEAE/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+      <meta itemprop="name" content="mchen">
+      <meta itemprop="description" content="天青色等烟雨，而我在等你">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="讲个笑话">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          论文笔记之HMEAE
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-12 14:17:50" itemprop="dateCreated datePublished" datetime="2019-12-12T14:17:50+08:00">2019-12-12</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-06 22:47:42" itemprop="dateModified" datetime="2020-07-06T22:47:42+08:00">2020-07-06</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/paper/" itemprop="url" rel="index">
+                    <span itemprop="name">paper</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>论文地址：<a href="https://www.aclweb.org/anthology/D19-1584.pdf" target="_blank" rel="noopener"> HMEAE: Hierarchical Modular Event Argument Extraction </a></p>
+<h3 id="摘要"><a href="#摘要" class="headerlink" title="摘要"></a>摘要</h3><p>现有的事件提取方法将每个论元角色独立分类，而忽略了不同论元角色之间的概念相关性。本文提出了事件论元抽取<strong>HMEAE模型</strong>，以从事件论元角色的概念层次结构提供有效的归纳偏差。具体来说，我们为概念层次结构的每个基本单元设计了一个神经模块网络，然后将具有逻辑操作的相关单元模块按层次结构组合到面向规则的模块化网络中，以对特定的论元角色进行分类。</p>
+<a id="more"></a>
+
+<h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p><img src="/2019/12/12/HMEAE/figure1.png" alt></p>
+<p>以图1为例，该论文认为，Seller与Buyer概念上比Seller与Time-within更接近，因为他们在概念层次结构中共享相同的Superordinate Concept ”Person“和”Org“。直观上认为这会提供更多语义信息以提升论元抽取的性能。</p>
+<p>如图1所示，将概念分成2部分：上层概念和下层的细粒度的论元角色。一个论元角色可能属于2个或以上的上层概念。</p>
+<p><img src="/2019/12/12/HMEAE/model.png" alt></p>
+<p>如图2所示，模型主要分成3个部分。1）对于每一个上层概念，实例化上层概念模块（SCM）以突出显示与该概念相关的文本信息；2）然后，对于每个论元角色，由其特定角色的逻辑联合模块组成与其上位概念相对应的SCM，以获得统一的高级模块；3）最后，根据高级模块的输出设置参数角色分类器，以预测实体是否属于给定的论元角色。</p>
+<h3 id="Instance-Encoder"><a href="#Instance-Encoder" class="headerlink" title="Instance Encoder"></a>Instance Encoder</h3><p>将句子表示成n个词的序列，x={w1,…t,…,a,…,wn}，t表示触发词，a是候选论元。触发词在ED工作中已经识别出，与EAE任务相互独立。</p>
+<h4 id="Sentence-Encoder"><a href="#Sentence-Encoder" class="headerlink" title="Sentence Encoder"></a>Sentence Encoder</h4><p>将单词序列编码为隐藏层表示，{h1,h2,…,hn} = E(w1,,…t,…,a,…,wn)，E(.)是对句子进行编码的神经网络。本文采用CNN和BERT作为编码器。</p>
+<h4 id="Feature-Aggregator"><a href="#Feature-Aggregator" class="headerlink" title="Feature Aggregator"></a>Feature Aggregator</h4><p>特征聚合器将隐层向量聚合到一个实例向量中，延用DMCNN的方法。<a href="https://www.jianshu.com/p/84fd666b1900" target="_blank" rel="noopener">DMCNN</a></p>
+<h3 id="Hierarchical-Modular-Attention"><a href="#Hierarchical-Modular-Attention" class="headerlink" title="Hierarchical Modular Attention"></a>Hierarchical Modular Attention</h3><p>上层概念模块会给每个隐藏的嵌入提供一个Attention分数，与其相关性建模。</p>
+<h4 id="Superordinate-Concept-Module"><a href="#Superordinate-Concept-Module" class="headerlink" title="Superordinate Concept Module"></a>Superordinate Concept Module</h4><p>上层概念模块，对于特定的上层概念c，我们用可训练的向量Uc表示其语义特征。 采用多层感知器来计算注意力得分。 首先计算隐藏状态，=========(3)。<a href="https://www.aclweb.org/anthology/D15-1166.pdf" target="_blank" rel="noopener">参考论文</a> <a href="https://www.jianshu.com/p/1c24eba3ba9c" target="_blank" rel="noopener">论文笔记</a></p>
+<p>再通过softmax计算获得隐层的Attention分数，=====(4)其中Wa和Wb是在不同上层概念模块之间共享的可训练  矩阵。</p>
+<h4 id="Logic-Union-Module"><a href="#Logic-Union-Module" class="headerlink" title="Logic Union Module"></a>Logic Union Module</h4><p>给定论元角色r∈R，我们将其k个上层概念表示为c1,c2,…ck。，ck和hi的相应注意力得分由(4)计算。由于应将所有上层概念的信息保留在面向角色的嵌入中，因此我们将注意力得分的平均值计算为面向角色的注意力得分(5)。</p>
+<p>然后计算隐层embedding的加权总和作为面向论元角色的embedding。</p>
+<h3 id="Argument-Role-Classifier"><a href="#Argument-Role-Classifier" class="headerlink" title="Argument Role Classifier"></a>Argument Role Classifier</h3><p>将实例词嵌入x和面向角色的嵌入e^r串联起来作为论元角色分类器的输入特征，并估算实例x的r属于R的概率，其中r是论元角色r的embedding。</p>
+<h3 id="Overall-Evaluation-Results"><a href="#Overall-Evaluation-Results" class="headerlink" title="Overall Evaluation Results"></a>Overall Evaluation Results</h3><p><img src="/2019/12/12/HMEAE/result.png" alt></p>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>上层概念模块有8类：[Person,Place,Org,Time,Good,Behavior,Entity,NA]。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
+              <a href="/tags/paper/" rel="tag"><i class="fa fa-tag"></i> paper</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/08/hexo%E5%A6%82%E4%BD%95%E5%9C%A8%E4%B8%8D%E5%90%8C%E7%94%B5%E8%84%91%E4%B8%8A%E5%86%99%E5%8D%9A%E5%AE%A2/" rel="prev" title="hexo如何在不同电脑上写博客">
+      <i class="fa fa-chevron-left"></i> hexo如何在不同电脑上写博客
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/15/max-subsequence/" rel="next" title="动态规划--子序列和回文串问题">
+      动态规划--子序列和回文串问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#摘要"><span class="nav-number">1.</span> <span class="nav-text">摘要</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简介"><span class="nav-number">2.</span> <span class="nav-text">简介</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Instance-Encoder"><span class="nav-number">3.</span> <span class="nav-text">Instance Encoder</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Sentence-Encoder"><span class="nav-number">3.1.</span> <span class="nav-text">Sentence Encoder</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Feature-Aggregator"><span class="nav-number">3.2.</span> <span class="nav-text">Feature Aggregator</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Hierarchical-Modular-Attention"><span class="nav-number">4.</span> <span class="nav-text">Hierarchical Modular Attention</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Superordinate-Concept-Module"><span class="nav-number">4.1.</span> <span class="nav-text">Superordinate Concept Module</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Logic-Union-Module"><span class="nav-number">4.2.</span> <span class="nav-text">Logic Union Module</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Argument-Role-Classifier"><span class="nav-number">5.</span> <span class="nav-text">Argument Role Classifier</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Overall-Evaluation-Results"><span class="nav-number">6.</span> <span class="nav-text">Overall Evaluation Results</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#其他"><span class="nav-number">7.</span> <span class="nav-text">其他</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mchen"
+      src="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+  <p class="site-author-name" itemprop="name">mchen</p>
+  <div class="site-description" itemprop="description">天青色等烟雨，而我在等你</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">6</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">4</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">10</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaomindog" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaomindog" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1131651415@qq.com" title="E-Mail → mailto:1131651415@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+
+<div class="copyright">
+
+  
+  &copy; 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mchen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+-->
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
