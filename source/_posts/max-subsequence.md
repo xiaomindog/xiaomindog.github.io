@@ -1,5 +1,5 @@
 ---
-title: 动态规划--子序列和回文串问题
+title: 动态规划——子序列和回文串问题
 date: 2019-12-15 20:31:36
 tags: [leetcode,动态规划,字符串]
 categories: 'leetcode'
