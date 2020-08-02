@@ -2,7 +2,7 @@
 title: 链表双指针：到底该走几步？
 date: 2020-08-01 16:27:21
 tags: [leetcode,链表]
-categories:[leetcode]
+categories: [leetcode]
 ---
 
 环形链表II和链表中的相交结点 
