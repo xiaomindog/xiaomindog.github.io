@@ -5,7 +5,7 @@ tags: [leetcode,链表]
 categories: [leetcode]
 ---
 
-环形链表II和链表中的相交结点 
+环形链表II和相交链表
 
 <!--more-->
 
@@ -80,5 +80,42 @@ public class Solution {
 
 
 
+##  相交链表
 
+[相交链表]( https://leetcode-cn.com/problems/intersection-of-two-linked-lists/ )
+
+找到两个单链表相交的起始节点，记链表长度分别为`a`和`b`，可以考虑`fast`结点先走 `abs(a-b)` 步， 然后`fast`和`slow`指针在同时往后走直到相交结点。但是获得`lenA`和`lenB`需要多次遍历链表。
+
+现在考虑如何减少遍历的次数。
+
+设链表`A`的长度为`a`，链表`B`的长度为`b`，`A`到相交结点的距离为`c`,`B`到相交节点的距离为`d`。
+
+显然可以得到两者相交链表的长度：`a - c = b - d`，
+
+ 变换一下式子得到：`a + d = b + c`。
+
+用一个指针从链表`A`出发，到末尾后就从`B`出发，用另一个指针从`B`出发，到末尾后从`A`出发，
+
+当前一个指针走了`a+d`步数时，后一个指针走了`b+c`,两步数相等，即走到了相交节点。
+
+```java
+public class Solution {
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        ListNode q = headA, p = headB;
+        while (q != p) {
+            if (q != null) {
+                q = q.next;
+            } else {
+                q = headB;
+            }
+            if (p != null) {
+                p = p.next;
+            } else {
+                p = headA;
+            }
+        }
+        return q;
+    }
+}
+```
 
