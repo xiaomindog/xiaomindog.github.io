@@ -2,6 +2,7 @@
 title: RNN相关知识点
 date: 2021-01-18 19:54:55
 tags: [NLP,deeplearning]
+mathjax: true
 categories: [deeplearning]
 ---
 
