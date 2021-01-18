@@ -6,9 +6,9 @@ mathjax: true
 categories: [deeplearning]
 ---
 
-<!--more-->
-
 引入RNN：处理序列问题
+
+<!--more-->
 
 最基本的单层网络结构为，输入x，经过Wx+b和激活函数得到输出y。RNN在这个基础上引入了隐藏层h，h可对序列数据提取特征，接着在转换为输出。
 

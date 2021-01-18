@@ -2,6 +2,7 @@
 title: Pre-trained Models for Natural Language Processing: A survey
 date: 2021-01-18 20:04:57
 tags: [NLP,deeplearning]
+mathjax: true
 categories: [deeplearning]
 ---
 
