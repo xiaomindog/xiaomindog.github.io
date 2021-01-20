@@ -3,7 +3,6 @@ title: Pre-trained Models for Natural Language Processing: A survey
 date: 2021-01-20 12:04:16
 tags: [NLP,deeplearning]
 categories: [deeplearning]
-mathjax: true
 ---
 
 该文通过四种分类维度来划分目前已有的预训练模型。包括：

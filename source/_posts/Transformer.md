@@ -67,6 +67,20 @@ Transformer 的并行化主要体现在 self-attention 模块，在 Encoder 端 
 
 ###  8. Transformer的位置编码？
 
+ 给定一个长度为![[公式]](https://www.zhihu.com/equation?tex=n)的输入序列，让![[公式]](https://www.zhihu.com/equation?tex=t)表示词在序列中的位置，![[公式]](https://www.zhihu.com/equation?tex=%5Coverrightarrow%7Bp_t%7D+%5Cin+%5Cmathbb%7BR%7D%5Ed)表示![[公式]](https://www.zhihu.com/equation?tex=t)位置对应的向量，![[公式]](https://www.zhihu.com/equation?tex=d)是向量的维度。![[公式]](https://www.zhihu.com/equation?tex=f%3A+%5Cmathbb%7BN%7D+%5Crightarrow+%5Cmathbb%7BR%7D%5Ed)是生成位置向量![[公式]](https://www.zhihu.com/equation?tex=%5Coverrightarrow%7Bp_t%7D)的函数，定义如下： 
+$$
+\vec{p_t}^{(i)} = f(t)^{(i)} := \begin{cases}
+      \sin({\omega_k} . t),  & \text{if}\  i = 2k \\
+      \cos({\omega_k} . t),  & \text{if}\  i = 2k + 1
+  \end{cases}
+$$
+
+$$
+where\quad \omega_k = \frac{1}{10000^{2k / d}}
+$$
+
+
+
 ###  9. Transformer的时间复杂度是多少？对比RNN，CNN呢？
 
 *一个形状为N\*M的矩阵，与另一个形状为M\*P的矩阵相乘，其运算复杂度来源于乘法操作的次数，时间复杂度为 O(N*M*P)。*
