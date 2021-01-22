@@ -47,8 +47,6 @@ Decoder端：
 
 ​	QKV来源于input的embedding，通过神经网络学习到不同的权重。简单来理解：Q是当前词，K是其他词，V是内容。
 
-​	
-
 ###  5. Transformer 为什么需要进行 Multi-head Attention？这样做有什么好处？Multi-head Attention 的计算过程？
 
 将模型分为多个头，形成多个子空间，可以让模型去关注不同方面的信息，最后再将各个方面的信息综合起来。类比 CNN 中同时使用多个卷积核的作用，多头的注意力有助于网络捕捉到更丰富的特征/信息。
@@ -67,7 +65,7 @@ Transformer 的并行化主要体现在 self-attention 模块，在 Encoder 端 
 
 ###  8. Transformer的位置编码？
 
- 给定一个长度为![[公式]](https://www.zhihu.com/equation?tex=n)的输入序列，让![[公式]](https://www.zhihu.com/equation?tex=t)表示词在序列中的位置，![[公式]](https://www.zhihu.com/equation?tex=%5Coverrightarrow%7Bp_t%7D+%5Cin+%5Cmathbb%7BR%7D%5Ed)表示![[公式]](https://www.zhihu.com/equation?tex=t)位置对应的向量，![[公式]](https://www.zhihu.com/equation?tex=d)是向量的维度。![[公式]](https://www.zhihu.com/equation?tex=f%3A+%5Cmathbb%7BN%7D+%5Crightarrow+%5Cmathbb%7BR%7D%5Ed)是生成位置向量![[公式]](https://www.zhihu.com/equation?tex=%5Coverrightarrow%7Bp_t%7D)的函数，定义如下： 
+ 给定一个长度为n的输入序列，让t表示词在序列中的位置，p_t表示t位置对应的向量，d是向量的维度。f是生成位置向量p_t的函数，定义如下： 
 $$
 \vec{p_t}^{(i)} = f(t)^{(i)} := \begin{cases}
       \sin({\omega_k} . t),  & \text{if}\  i = 2k \\
@@ -124,4 +122,6 @@ $$
 [Transformer/CNN/RNN的对比（时间复杂度，序列操作数，最大路径长度）](https://zhuanlan.zhihu.com/p/264749298)
 
 [BERT大火却不懂Transformer？读这一篇就够了](https://zhuanlan.zhihu.com/p/54356280)
+
+[Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
