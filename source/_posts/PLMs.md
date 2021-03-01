@@ -1,8 +1,8 @@
 ---
-title: Pre-trained Models for Natural Language Processing: A survey
-date: 2021-01-20 12:04:16
-tags: [NLP,deeplearning]
-categories: [deeplearning]
+title: 预训练语言模型相关 
+date: 2021-03-01 16:10:51
+tags: ["NLP","deeplearning"]
+categories: ["LM"]
 ---
 
 该文通过四种分类维度来划分目前已有的预训练模型。包括：
@@ -109,4 +109,5 @@ categories: [deeplearning]
 
 [2020最新NLP预训练模型综述](https://zhuanlan.zhihu.com/p/317260710)
 
-[XLNet:运行机制及和Bert的异同比较](https://zhuanlan.zhihu.com/p/70257427)
+[XLNet:运行机制及和Bert的异同比较](https://zhuanlan.zhihu.com/p/70257427)[XLNet:运行机制及和Bert的异同比较](https://zhuanlan.zhihu.com/p/70257427)
+
