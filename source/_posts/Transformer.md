@@ -40,6 +40,8 @@ Decoder端：
   $$
   Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V
   $$
+  
+- **为什么要有一个根号d_k？** 假设两个 dk 维向量每个分量都是一个相互独立的服从标准正态分布的随机变量，那么他们的点乘结果会变得很大，并且服从均值为0，方差就是 dk，【很大的点乘会让softmax函数处在梯度很小的区域】，对每一个分量除以 sqrt(d_k) 可以让点乘的方差变成 1。 
 
 ###  4.如何理解self-attention中的Q,K,V?
 
@@ -65,6 +67,8 @@ Transformer 的并行化主要体现在 self-attention 模块，在 Encoder 端 
 
 ###  8. Transformer的位置编码？
 
+为什么要引入位置编码？ 如果没有位置编码，就失去了词序的信息。
+
  给定一个长度为n的输入序列，让t表示词在序列中的位置，p_t表示t位置对应的向量，d是向量的维度。f是生成位置向量p_t的函数，定义如下： 
 $$
 \vec{p_t}^{(i)} = f(t)^{(i)} := \begin{cases}
@@ -77,7 +81,11 @@ $$
 where\quad \omega_k = \frac{1}{10000^{2k / d}}
 $$
 
-
+- 它能为每个时间步输出一个独一无二的编码；
+- 不同长度的句子之间，任何两个时间步之间的距离应该保持一致；
+- 模型应该能毫不费力地泛化到更长的句子。它的值应该是有界的；
+- 它必须是确定性的。
+-  正弦曲线函数的位置编码的另一个特点是，它能让模型毫不费力地关注相对位置信息 ， 因为对于任何固定的偏移量![[公式]](https://www.zhihu.com/equation?tex=k)，![[公式]](https://www.zhihu.com/equation?tex=%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%2Bk%7D)可以表示成![[公式]](https://www.zhihu.com/equation?tex=%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%7D)的线性函数。 
 
 ###  9. Transformer的时间复杂度是多少？对比RNN，CNN呢？
 
@@ -111,6 +119,13 @@ $$
 
   注：多头的计算并不是通过循环完成的，而是通过 transposes and reshapes，用矩阵乘法来完成的。假设有h个head，则新的representation dimension：m=d/h。因为，我们将n\*d矩阵拆为n\*h\*m张量，再利用转置操作转为h\*n\*m 的张量。故 QK^T的计算为： h\*n\*m与 h\*m\*n做计算，得到h\*n\*n的张量，复杂度为O(h^2n^2m)，即O(n^2dh) 。注意，此处h实际是一个常数，故QK^T复杂度为O(n^2d) 。
 
+###  10. Transformer为什么要引入LN？
+
+- LN则是针对每一句话做归一化处理。例如：我是中国人我爱中国——归一化处理后，一句话内每个字之间的联系并没有破坏。 
+
+- layer normalization 有助于得到一个球体空间中符合**0均值1方差**高斯分布的 embedding， batch normalization不具备这个功能。 
+- layer normalization可以对transformer学习过程中由于多词条embedding累加可能带来的“尺度”问题施加约束，相当于对表达每个词**一词多义的空间施加了约束**，有效降低模型方差。batch normalization也不具备这个功能。
+
 ###  Renference
 
 [Attention Is All You Need](https://arxiv.org/abs/1706.03762)
@@ -125,3 +140,6 @@ $$
 
 [Transformer Architecture: The Positional Encoding](https://kazemnejad.com/blog/transformer_architecture_positional_encoding/)
 
+[Transformer 为什么使用 layer normalization，而不是其他的归一化](https://www.zhihu.com/question/395811291)
+
+[Transformer中的位置编码](https://zhuanlan.zhihu.com/p/106644634)
