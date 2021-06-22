@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="本文以QA的方式整理关于transformer的知识点。">
+<meta name="keywords" content="NLP,deeplearning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Transformer">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;01&#x2F;20&#x2F;Transformer&#x2F;index.html">
+<meta property="og:site_name" content="讲个笑话">
+<meta property="og:description" content="本文以QA的方式整理关于transformer的知识点。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;www.zhihu.com&#x2F;equation?tex&#x3D;k">
+<meta property="og:image" content="https:&#x2F;&#x2F;www.zhihu.com&#x2F;equation?tex&#x3D;%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%2Bk%7D">
+<meta property="og:image" content="https:&#x2F;&#x2F;www.zhihu.com&#x2F;equation?tex&#x3D;%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%7D">
+<meta property="og:updated_time" content="2021-06-22T13:12:32.815Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;www.zhihu.com&#x2F;equation?tex&#x3D;k">
+
+<link rel="canonical" href="http://yoursite.com/2021/01/20/Transformer/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Transformer | 讲个笑话</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">讲个笑话</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">能力随心，自然成长</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-paper">
+
+    <a href="/paper/" rel="section"><i class="fa fa-fw fa-file-text"></i>论文</a>
+
+  </li>
+        <li class="menu-item menu-item-feeling">
+
+    <a href="/feeling/" rel="section"><i class="fa fa-fw fa-pencil"></i>随笔</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/20/Transformer/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+      <meta itemprop="name" content="mchen">
+      <meta itemprop="description" content="天青色等烟雨，而我在等你">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="讲个笑话">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Transformer
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-20 11:08:46" itemprop="dateCreated datePublished" datetime="2021-01-20T11:08:46+08:00">2021-01-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-22 21:12:32" itemprop="dateModified" datetime="2021-06-22T21:12:32+08:00">2021-06-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/deeplearning/" itemprop="url" rel="index">
+                    <span itemprop="name">deeplearning</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文以QA的方式整理关于transformer的知识点。</p>
+<a id="more"></a>
+<h3 id="1-Transformer的结构是什么样的？"><a href="#1-Transformer的结构是什么样的？" class="headerlink" title="1.Transformer的结构是什么样的？"></a>1.Transformer的结构是什么样的？</h3><p>transformer本质上还是一个典型的encoder-decoder模型，encoder和decoder端各有6个相同的大模块构成。</p>
+<ul>
+<li>encoder（由2个子模块构成）：多头self-attention+前馈神经网络</li>
+<li>decoder（由3个子模块构成）：多头self-attention+多头Encoder-Dencoder attention交互模块+前馈神经网络</li>
+</ul>
+<h3 id="2-Transformer-Encoder和Decoder-端的输入输出具体是什么？"><a href="#2-Transformer-Encoder和Decoder-端的输入输出具体是什么？" class="headerlink" title="2. Transformer Encoder和Decoder 端的输入输出具体是什么？"></a>2. Transformer Encoder和Decoder 端的输入输出具体是什么？</h3><p>Encoder端：</p>
+<ul>
+<li>输入：Encoder 端每个大模块接收的输入是不一样的，第一个大模块(最底下的那个)接收的输入是输入序列的 embedding(embedding 可以通过 word2vec 预训练得来)，其余大模块接收的是其前一个大模块的输出。</li>
+<li>输出：最后一个模块的输出作为整个 Encoder 端的输出。</li>
+</ul>
+<p>Decoder端：</p>
+<ul>
+<li>输入：encoder的输出 &amp; 对应i-1位置decoder的输出。所以中间的attention不是self-attention，它的K，V来自encoder，Q来自上一位置decoder的输出</li>
+<li>输出：对应i位置的输出词的概率分布</li>
+<li>解码：<strong>编码可以并行计算，一次性全部encoding出来，但解码不是一次把所有序列解出来的，而是像rnn一样一个一个解出来的</strong>，因为要用上一个位置的输入当作attention的query。</li>
+</ul>
+<h3 id="3-Transformer-中的-self-attention-是什么？self-attention-的计算过程？"><a href="#3-Transformer-中的-self-attention-是什么？self-attention-的计算过程？" class="headerlink" title="3. Transformer 中的 self-attention 是什么？self-attention 的计算过程？"></a>3. Transformer 中的 self-attention 是什么？self-attention 的计算过程？</h3><ul>
+<li><p>self-attention是什么？</p>
+<p>self-attention是一种通过自身和自身相关联的 attention 机制（而attention本身就是一种特征加权求和的计算）。在 self-attention 中， 序列中的每个单词和该序列中其余单词进行 attention 计算。self-attention 的特点在于<strong>无视token之间的距离直接计算依赖关系，从而能够学习到序列的内部结构</strong>，实现起来也比较简单。引入 Self Attention 后会<strong>更容易捕获句子中长距离的相互依赖的特征</strong>，因为如果是 RNN 或者 LSTM，需要依次序序列计算，对于远距离的相互依赖的特征，要经过若干时间步步骤的信息累积才能将两者联系起来，而距离越远，有效捕获的可能性越小。 Self-Attention 在计算过程中会直接将句子中任意两个单词的联系通过一个计算步骤直接联系起来，所以远距离依赖特征之间的距离被极大缩短，有利于有效地利用这些特征。除此外，Self Attention 对于<strong>增加计算的并行性</strong>也有直接帮助作用。</p>
+</li>
+<li><p>self-attention的计算过程</p>
+<script type="math/tex; mode=display">
+Attention(Q,K,V)=softmax(\frac{QK^{T}}{\sqrt{d_{k}}})V</script></li>
+<li><p><strong>为什么要有一个根号d_k？</strong> 假设两个 dk 维向量每个分量都是一个相互独立的服从标准正态分布的随机变量，那么他们的点乘结果会变得很大，并且服从均值为0，方差就是 dk，【很大的点乘会让softmax函数处在梯度很小的区域】，对每一个分量除以 sqrt(d_k) 可以让点乘的方差变成 1。 </p>
+</li>
+</ul>
+<h3 id="4-如何理解self-attention中的Q-K-V"><a href="#4-如何理解self-attention中的Q-K-V" class="headerlink" title="4.如何理解self-attention中的Q,K,V?"></a>4.如何理解self-attention中的Q,K,V?</h3><p>​    <strong>计算attention的过程，即使用一个Q(query)，计算它和每个K(key)的相似度作为权重，对所有的V(value)进行加权求和。</strong></p>
+<p>​    QKV来源于input的embedding，通过神经网络学习到不同的权重。简单来理解：Q是当前词，K是其他词，V是内容。</p>
+<h3 id="5-Transformer-为什么需要进行-Multi-head-Attention？这样做有什么好处？Multi-head-Attention-的计算过程？"><a href="#5-Transformer-为什么需要进行-Multi-head-Attention？这样做有什么好处？Multi-head-Attention-的计算过程？" class="headerlink" title="5. Transformer 为什么需要进行 Multi-head Attention？这样做有什么好处？Multi-head Attention 的计算过程？"></a>5. Transformer 为什么需要进行 Multi-head Attention？这样做有什么好处？Multi-head Attention 的计算过程？</h3><p>将模型分为多个头，形成多个子空间，可以让模型去关注不同方面的信息，最后再将各个方面的信息综合起来。类比 CNN 中同时使用多个卷积核的作用，多头的注意力有助于网络捕捉到更丰富的特征/信息。</p>
+<h3 id="6-Transformer-是如何训练的？测试阶段如何进行测试呢？"><a href="#6-Transformer-是如何训练的？测试阶段如何进行测试呢？" class="headerlink" title="6. Transformer 是如何训练的？测试阶段如何进行测试呢？"></a>6. Transformer 是如何训练的？测试阶段如何进行测试呢？</h3><p>Transformer 训练过程与 seq2seq 类似，首先 Encoder 端得到输入的 encoding 表示，并将其输入到 Decoder 端做交互式 attention，之后在 Decoder 端接收其相应的输入，经过多头 self-attention 模块之后，结合 Encoder 端的输出，再经过 FFN，得到 Decoder 端的输出之后，最后经过一个线性全连接层，就可以通过 softmax 来预测下一个token，然后根据 softmax 多分类的损失函数，将 loss 反向传播即可，所以从整体上来说，Transformer 训练过程就相当于一个有监督的多分类问题。</p>
+<p>而对于测试阶段，其与训练阶段唯一不同的是 Decoder 端最底层的输入，先生成第一个位置的输出，然后有了这个之后，第二次预测时，再将其加入输入序列，以此类推直至预测结束。</p>
+<ul>
+<li>需要注意的是，Encoder 端可以并行计算，一次性将输入序列全部 encoding 出来，但 Decoder 端不是一次性把所有token预测出来的，而是像 seq2seq 一样一个接着一个预测出来的。</li>
+</ul>
+<h3 id="7-Transformer的并行化体现在哪里？"><a href="#7-Transformer的并行化体现在哪里？" class="headerlink" title="7. Transformer的并行化体现在哪里？"></a>7. Transformer的并行化体现在哪里？</h3><p>Transformer 的并行化主要体现在 self-attention 模块，在 Encoder 端 Transformer 可以并行处理整个序列，并得到整个输入序列经过 Encoder 端的输出，在 self-attention 模块，对于某个序列x1,x2,…,xn ，self-attention 模块可以直接计算xi*xj的点乘结果，而 RNN 系列的模型就必须按照顺序从x1计算到xn。</p>
+<h3 id="8-Transformer的位置编码？"><a href="#8-Transformer的位置编码？" class="headerlink" title="8. Transformer的位置编码？"></a>8. Transformer的位置编码？</h3><p>为什么要引入位置编码？ 如果没有位置编码，就失去了词序的信息。</p>
+<p> 给定一个长度为n的输入序列，让t表示词在序列中的位置，p_t表示t位置对应的向量，d是向量的维度。f是生成位置向量p_t的函数，定义如下： </p>
+<script type="math/tex; mode=display">
+\vec{p_t}^{(i)} = f(t)^{(i)} := \begin{cases}
+      \sin({\omega_k} . t),  & \text{if}\  i = 2k \\
+      \cos({\omega_k} . t),  & \text{if}\  i = 2k + 1
+  \end{cases}</script><script type="math/tex; mode=display">
+where\quad \omega_k = \frac{1}{10000^{2k / d}}</script><ul>
+<li>它能为每个时间步输出一个独一无二的编码；</li>
+<li>不同长度的句子之间，任何两个时间步之间的距离应该保持一致；</li>
+<li>模型应该能毫不费力地泛化到更长的句子。它的值应该是有界的；</li>
+<li>它必须是确定性的。</li>
+<li>正弦曲线函数的位置编码的另一个特点是，它能让模型毫不费力地关注相对位置信息 ， 因为对于任何固定的偏移量<img src="https://www.zhihu.com/equation?tex=k" alt="[公式]">，<img src="https://www.zhihu.com/equation?tex=%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%2Bk%7D" alt="[公式]">可以表示成<img src="https://www.zhihu.com/equation?tex=%5Ctext%7BPE%7D_%7B%5Ctext%7Bpos%7D%7D" alt="[公式]">的线性函数。 </li>
+</ul>
+<h3 id="9-Transformer的时间复杂度是多少？对比RNN，CNN呢？"><a href="#9-Transformer的时间复杂度是多少？对比RNN，CNN呢？" class="headerlink" title="9. Transformer的时间复杂度是多少？对比RNN，CNN呢？"></a>9. Transformer的时间复杂度是多少？对比RNN，CNN呢？</h3><p><em>一个形状为N\</em>M的矩阵，与另一个形状为M*P的矩阵相乘，其运算复杂度来源于乘法操作的次数，时间复杂度为 O(N<em>M</em>P)。*</p>
+<ul>
+<li><p>self-attention</p>
+<ul>
+<li>Q,K,V：n*d</li>
+<li>相似度计算：Q*K^T，复杂度为O(n^2d)</li>
+<li>softmax计算：对每行做softmax，复杂度为 O(n)，则n行的复杂度为 O(n^2)</li>
+<li>加权和：n*n与n*d运算，得到n*d矩阵，复杂度为O(n^2d)</li>
+</ul>
+<p>所以self-attention的时间复杂度为O(n^2d)</p>
+</li>
+<li><p>Multi-Head Attention</p>
+<script type="math/tex; mode=display">
+MultiHead(Q,K,V) = Concat(head_1,...,head_h)W^O</script><script type="math/tex; mode=display">
+Where \quad head_i = Attention(QW_{i}^Q,KW_{i}^k,VW_i^V)</script><p>假设有h个head（h为常数），对于每个head，对于每个head，首先需要把三个矩阵分别映射到 d_q,d_k,d_v 维度。d_q=d_k=d_v=d/h。</p>
+<ul>
+<li>输入线性映射的复杂度：n*d与d*d/h运算，复杂度为O(nd^2)</li>
+<li>Attention的计算：O(n^2d)</li>
+<li>输出线性映射的复杂度：concat操作拼起来形成 n*d 的矩阵，然后经过输出线性映射，保证输入输出相同，所以是n*d 与 d*d 计算，复杂度为O(nd^2)</li>
+</ul>
+<p>所以Multi-Head Attention的时间复杂度为O(nd^2+n^2d)</p>
+<p>注：多头的计算并不是通过循环完成的，而是通过 transposes and reshapes，用矩阵乘法来完成的。假设有h个head，则新的representation dimension：m=d/h。因为，我们将n*d矩阵拆为n*h*m张量，再利用转置操作转为h*n*m 的张量。故 QK^T的计算为： h*n*m与 h*m*n做计算，得到h*n*n的张量，复杂度为O(h^2n^2m)，即O(n^2dh) 。注意，此处h实际是一个常数，故QK^T复杂度为O(n^2d) 。</p>
+</li>
+</ul>
+<h3 id="10-Transformer为什么要引入LN？"><a href="#10-Transformer为什么要引入LN？" class="headerlink" title="10. Transformer为什么要引入LN？"></a>10. Transformer为什么要引入LN？</h3><ul>
+<li><p>LN则是针对每一句话做归一化处理。例如：我是中国人我爱中国——归一化处理后，一句话内每个字之间的联系并没有破坏。 </p>
+</li>
+<li><p>layer normalization 有助于得到一个球体空间中符合<strong>0均值1方差</strong>高斯分布的 embedding， batch normalization不具备这个功能。 </p>
+</li>
+<li>layer normalization可以对transformer学习过程中由于多词条embedding累加可能带来的“尺度”问题施加约束，相当于对表达每个词<strong>一词多义的空间施加了约束</strong>，有效降低模型方差。batch normalization也不具备这个功能。</li>
+</ul>
+<h3 id="Renference"><a href="#Renference" class="headerlink" title="Renference"></a>Renference</h3><p><a href="https://arxiv.org/abs/1706.03762" target="_blank" rel="noopener">Attention Is All You Need</a></p>
+<p><a href="https://blog.csdn.net/fengdu78/article/details/104629336" target="_blank" rel="noopener">关于Transformer，面试官们都怎么问？</a></p>
+<p><a href="http://jalammar.github.io/illustrated-transformer/" target="_blank" rel="noopener">The Illustrated Transformer</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/264749298" target="_blank" rel="noopener">Transformer/CNN/RNN的对比（时间复杂度，序列操作数，最大路径长度）</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/54356280" target="_blank" rel="noopener">BERT大火却不懂Transformer？读这一篇就够了</a></p>
+<p><a href="https://kazemnejad.com/blog/transformer_architecture_positional_encoding/" target="_blank" rel="noopener">Transformer Architecture: The Positional Encoding</a></p>
+<p><a href="https://www.zhihu.com/question/395811291" target="_blank" rel="noopener">Transformer 为什么使用 layer normalization，而不是其他的归一化</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/106644634" target="_blank" rel="noopener">Transformer中的位置编码</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
+              <a href="/tags/deeplearning/" rel="tag"><i class="fa fa-tag"></i> deeplearning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/18/RNN/" rel="prev" title="RNN相关知识点">
+      <i class="fa fa-chevron-left"></i> RNN相关知识点
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/01/20/knowledge-distillation/" rel="next" title="knowledge distillation">
+      knowledge distillation <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Transformer的结构是什么样的？"><span class="nav-number">1.</span> <span class="nav-text">1.Transformer的结构是什么样的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-Transformer-Encoder和Decoder-端的输入输出具体是什么？"><span class="nav-number">2.</span> <span class="nav-text">2. Transformer Encoder和Decoder 端的输入输出具体是什么？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-Transformer-中的-self-attention-是什么？self-attention-的计算过程？"><span class="nav-number">3.</span> <span class="nav-text">3. Transformer 中的 self-attention 是什么？self-attention 的计算过程？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4-如何理解self-attention中的Q-K-V"><span class="nav-number">4.</span> <span class="nav-text">4.如何理解self-attention中的Q,K,V?</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#5-Transformer-为什么需要进行-Multi-head-Attention？这样做有什么好处？Multi-head-Attention-的计算过程？"><span class="nav-number">5.</span> <span class="nav-text">5. Transformer 为什么需要进行 Multi-head Attention？这样做有什么好处？Multi-head Attention 的计算过程？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#6-Transformer-是如何训练的？测试阶段如何进行测试呢？"><span class="nav-number">6.</span> <span class="nav-text">6. Transformer 是如何训练的？测试阶段如何进行测试呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#7-Transformer的并行化体现在哪里？"><span class="nav-number">7.</span> <span class="nav-text">7. Transformer的并行化体现在哪里？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#8-Transformer的位置编码？"><span class="nav-number">8.</span> <span class="nav-text">8. Transformer的位置编码？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#9-Transformer的时间复杂度是多少？对比RNN，CNN呢？"><span class="nav-number">9.</span> <span class="nav-text">9. Transformer的时间复杂度是多少？对比RNN，CNN呢？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#10-Transformer为什么要引入LN？"><span class="nav-number">10.</span> <span class="nav-text">10. Transformer为什么要引入LN？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Renference"><span class="nav-number">11.</span> <span class="nav-text">Renference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mchen"
+      src="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+  <p class="site-author-name" itemprop="name">mchen</p>
+  <div class="site-description" itemprop="description">天青色等烟雨，而我在等你</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaomindog" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaomindog" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1131651415@qq.com" title="E-Mail → mailto:1131651415@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+
+<div class="copyright">
+
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mchen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+-->
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="该文通过四种分类维度来划分目前已有的预训练模型。包括：  「表征的类型」,即：学习到的表征是否是上下文感知的。  「编码器结构」,如：LSTM、Transformer；  「预训练任务类型」,如LM，MLM，PLM；  「针对特定场景的拓展」,如跨语言预训练，知识增强，多模态预训练，模型压缩等。">
+<meta name="keywords" content="NLP,deeplearning">
+<meta property="og:type" content="article">
+<meta property="og:title" content="预训练语言模型相关">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;03&#x2F;01&#x2F;PLMs&#x2F;index.html">
+<meta property="og:site_name" content="讲个笑话">
+<meta property="og:description" content="该文通过四种分类维度来划分目前已有的预训练模型。包括：  「表征的类型」,即：学习到的表征是否是上下文感知的。  「编码器结构」,如：LSTM、Transformer；  「预训练任务类型」,如LM，MLM，PLM；  「针对特定场景的拓展」,如跨语言预训练，知识增强，多模态预训练，模型压缩等。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-06-22T13:12:32.799Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/01/PLMs/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>预训练语言模型相关 | 讲个笑话</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">讲个笑话</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">能力随心，自然成长</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-paper">
+
+    <a href="/paper/" rel="section"><i class="fa fa-fw fa-file-text"></i>论文</a>
+
+  </li>
+        <li class="menu-item menu-item-feeling">
+
+    <a href="/feeling/" rel="section"><i class="fa fa-fw fa-pencil"></i>随笔</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/01/PLMs/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+      <meta itemprop="name" content="mchen">
+      <meta itemprop="description" content="天青色等烟雨，而我在等你">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="讲个笑话">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          预训练语言模型相关
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-01 16:10:51" itemprop="dateCreated datePublished" datetime="2021-03-01T16:10:51+08:00">2021-03-01</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-22 21:12:32" itemprop="dateModified" datetime="2021-06-22T21:12:32+08:00">2021-06-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/LM/" itemprop="url" rel="index">
+                    <span itemprop="name">LM</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>该文通过四种分类维度来划分目前已有的预训练模型。包括：</p>
+<ul>
+<li><p><strong>「表征的类型」</strong>,即：学习到的表征是否是上下文感知的。</p>
+</li>
+<li><p><strong>「编码器结构」</strong>,如：LSTM、Transformer；</p>
+</li>
+<li><p><strong>「预训练任务类型」</strong>,如LM，MLM，PLM；</p>
+</li>
+<li><p><strong>「针对特定场景的拓展」</strong>,如跨语言预训练，知识增强，多模态预训练，模型压缩等。</p>
+<a id="more"></a>
+</li>
+</ul>
+<h3 id="1-表征的类型"><a href="#1-表征的类型" class="headerlink" title="1. 表征的类型"></a>1. 表征的类型</h3><ul>
+<li><p>非上下文感知</p>
+<p>非上下文感知的词语表示是静态的，无法解决一词多义问题和OOV问题（Word2Vec），这种情况下一般只能通过character-level或者sub-word embedding来解决，即通过拆解词粒度为字符粒度来解决泛化性问题。</p>
+<p>这一类的代表性工作包括：<strong>「NNLM」</strong>,<strong>「word2vec」</strong>,<strong>「GloVe」</strong>。</p>
+</li>
+<li><p>上下文感知</p>
+<p>词语会随着词所在的上下文不同而动态变化，能够解决一词多义问题。token的表示需要依赖于整个文本。</p>
+<ul>
+<li><p>利用特征抽取器来产生上下文词嵌入表示</p>
+<p>代表性工作：<br>(1) <strong>「CoVe」：</strong>用带注意力机制的seq2seq从机器翻译任务中预训练一个LSTM encoder。输出的上下文向量(CoVe)有助于提升一系列NLP下游任务的性能。<br>(2) <strong>「ELMo」：</strong> 用两层的Bi-LSTM从双向语言模型任务BiLM（包括1个前向的语言模型以及1个后向的语言模型）中预训练一个<strong>Bi-LSTM Encoder</strong>。能够显著提升一系列NLP下游任务的性能。</p>
+</li>
+<li><p>微调</p>
+<p>代表性工作：</p>
+<p>(1) <strong>「ULMFiT」：</strong> 通过在文本分类任务上微调预训练好的语言模型达到了state-of-the-art结果。这篇也预训练模型微调模式的开创性工作。提出了3个阶段的微调：在通用数据上进行语言模型的预训练来学习通用语言特征；在目标任务所处的领域特定的数据上进行语言模型的微调来学习领域特征；在目标任务上进行微调。<br>(2) <strong>「GPT」：</strong>使用单向的Transformer预训练单向语言模型。单向的Transformer里头用到了masked self-attention的技巧（相当于是Transformer原始论文里头的Decoder结构），即当前词只能attend到前面出现的词上面。之所以只能用单向transformer，主要受制于单向的预训练语言模型任务，否则会造成信息泄露。</p>
+<p>(3) <strong>「BERT」：</strong>使用双向Transformer作为Encoder（即Transformer中的Encoder结构)，引入了新的预训练任务，带mask的语言模型任务MLM和下一个句子预测任务NSP。由于MLM预训练任务的存在，使得Transformer能够进行<strong>「双向」</strong>self-attention。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="2-上下文编码器架构"><a href="#2-上下文编码器架构" class="headerlink" title="2. 上下文编码器架构"></a>2. 上下文编码器架构</h3><ul>
+<li><p>卷积（TextCNN）</p>
+</li>
+<li><p>序列（Bi-LSTM）</p>
+</li>
+<li><p>图模型</p>
+<p>Transformer也是一种图网络的特例：句子中的词构成一张全连接图，图中任意两个词之间都有连边，连边的权重衡量了词之间的关联，通过self-attention来动态计算，目标是让模型自动学习到图的结构（实际上，图上的结点还带了词本身的属性信息，如位置信息等）</p>
+</li>
+</ul>
+<h3 id="3-预训练任务"><a href="#3-预训练任务" class="headerlink" title="3. 预训练任务"></a>3. 预训练任务</h3><p>监督学习，无监督学习，自监督学习</p>
+<p>自监督学习：核心思想是，用输入数据的一部分信息以某种形式去预测其另一部分信息。例如BERT中使用的MLM，输入数据是句子，通过句子中其它部分的单词信息来预测一部分masked的单词信息。-</p>
+<ul>
+<li><p>语言模型（LM）</p>
+<p>语言模型是指一类能够求解句子概率的概率模型，通常通过概率论中的链式法则来表示整个句子各个单词间的联合概率。链式求导法则的关键特点和原理是<strong>当前词的表示依赖于前面的单词（单向的自回归的）</strong>。</p>
+</li>
+<li><p>带掩码的语言模型（MLM）</p>
+<p>MLM主要是从BERT开始流行起来的，能够解决单向的LM的问题，进行双向的信息编码。</p>
+<p>MLM存在的缺点：</p>
+<ul>
+<li>会造成pre-training和fine-tuning之间的gap。[MASK]特殊字符不会出现在fine-tuning阶段出现</li>
+<li>MLM收敛的速度比较慢</li>
+<li>MLM不是标准的语言模型，其有着自己的独立性假设，即假设mask词之间是相互独立的。</li>
+<li>自回归LM模型能够通过联合概率的链式法则来计算句子的联合概率，而MLM只能进行<strong>「联合概率的有偏估计」</strong>(mask之间没有相互独立)</li>
+</ul>
+<p>增强版MLM：</p>
+<ul>
+<li><strong>RoBERTa：</strong>改进了BERT种静态masking的方法，采用了动态masking的方法。</li>
+<li><strong>UniLM：</strong>拓展mask prediction任务到三种语言模型任务中，单向预测、双向预测、seq2seq预测。</li>
+<li><strong>XLM：</strong>将MLM应用到翻译语言模型中，即“双语料句子对“构成一个句子，然后使用MLM。</li>
+<li><strong>SpanBERT：</strong>使用了span masking来随机掩盖一段连续的词。同时额外提出了一种<strong>边界学习目标</strong> ，希望被掩盖的词能够融入边界的信息，即基于边界之外的两个单词的向量和masked单词的位置向量来预测masked单词。</li>
+<li><strong>ERNIE：</strong>将外部知识融入到MLM中。引入了命名实体外部知识来掩盖实体单元，进行训练。</li>
+</ul>
+</li>
+<li><p>排列语言模型（PLM）</p>
+<p>PLM在<strong>XLNet</strong>中被提出。动机来源：预训练和微调阶段的gap，mask词之间的独立性假设等。</p>
+<p>在传统的单向自回归语言模型LM中，句子的联合概率因子分解是按照从左到右或者从右到左的方式分解成条件概率的链式乘积的，这可以看作是其中两种联合概率的因子分解序。实际上，句子的联合概率的因子分解序还可以有很多种，可以任意的排列组合进行因子分解。PLM就是对联合概率进行因子分解得到排列，分解得到的排列只决定了模型自回归时的预测顺序，不会改变原始文本序列的自然位置。即：PLM只是针对语言模型建模不同排列下的因子分解排列，并不是词的位置信息的重新排列。</p>
+<ul>
+<li><p>XLNet</p>
+<p>XLNet在输入阶段并没有改变输入顺序，随机打乱输入句子的顺序这个过程是在Transformer中通过<strong>Attention mask</strong>实现的，就是随机掩盖掉序列中的一些单词，并将未掩盖掉的单词作为预测单词的上文。</p>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="自回归与自编码模型"><a href="#自回归与自编码模型" class="headerlink" title="自回归与自编码模型"></a>自回归与自编码模型</h3><ul>
+<li><p>自回归（GPT, XLNet, EMLo）</p>
+<p>根据上文内容预测下一个单词，或者根据下文预测前面的单词，这种类型的LM被称为自回归语言模型。</p>
+<p>自回归语言模型有优点有缺点，优点是自然地引入上下文信息，并且解决<strong>自编码语言模型</strong>两阶段保持一致的问题。缺点是只能利用上文或者下文的信息，不能同时利用上文和下文的信息（ELMo融合方式过于简单所以效果不好）。</p>
+</li>
+<li><p>自编码（BERT）</p>
+</li>
+</ul>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="https://zhuanlan.zhihu.com/p/317260710" target="_blank" rel="noopener">2020最新NLP预训练模型综述</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/70257427" target="_blank" rel="noopener">XLNet:运行机制及和Bert的异同比较</a><a href="https://zhuanlan.zhihu.com/p/70257427" target="_blank" rel="noopener">XLNet:运行机制及和Bert的异同比较</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
+              <a href="/tags/deeplearning/" rel="tag"><i class="fa fa-tag"></i> deeplearning</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/20/knowledge-distillation/" rel="prev" title="knowledge distillation">
+      <i class="fa fa-chevron-left"></i> knowledge distillation
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/01/microsoft-work-organization/" rel="next" title="微软实习内容简单梳理">
+      微软实习内容简单梳理 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-表征的类型"><span class="nav-number">1.</span> <span class="nav-text">1. 表征的类型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-上下文编码器架构"><span class="nav-number">2.</span> <span class="nav-text">2. 上下文编码器架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-预训练任务"><span class="nav-number">3.</span> <span class="nav-text">3. 预训练任务</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自回归与自编码模型"><span class="nav-number">4.</span> <span class="nav-text">自回归与自编码模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference"><span class="nav-number">5.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mchen"
+      src="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+  <p class="site-author-name" itemprop="name">mchen</p>
+  <div class="site-description" itemprop="description">天青色等烟雨，而我在等你</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaomindog" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaomindog" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1131651415@qq.com" title="E-Mail → mailto:1131651415@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+
+<div class="copyright">
+
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mchen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+-->
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

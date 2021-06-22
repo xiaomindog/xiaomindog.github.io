@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="训练和部署两个阶段对模型的要求是不同的。在训练阶段，我们希望模型可以从大量的、高度冗余的信息中学到数据的特征，此阶段对延迟和计算资源没有太严格的要求。但是如果模型要被部署到大量用户那里，对延迟和计算资源的限制就很高。因此，我们可以先训练一个大模型。这个大模型可以是很多独立模型的集成，也可以是单个的使用了Dropout等正则化方法的复杂模型。在大模型训练好之后，我们就可以使用一个称为“蒸馏”的训练过">
+<meta name="keywords" content="NLP,distillation">
+<meta property="og:type" content="article">
+<meta property="og:title" content="knowledge distillation">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;01&#x2F;20&#x2F;knowledge-distillation&#x2F;index.html">
+<meta property="og:site_name" content="讲个笑话">
+<meta property="og:description" content="训练和部署两个阶段对模型的要求是不同的。在训练阶段，我们希望模型可以从大量的、高度冗余的信息中学到数据的特征，此阶段对延迟和计算资源没有太严格的要求。但是如果模型要被部署到大量用户那里，对延迟和计算资源的限制就很高。因此，我们可以先训练一个大模型。这个大模型可以是很多独立模型的集成，也可以是单个的使用了Dropout等正则化方法的复杂模型。在大模型训练好之后，我们就可以使用一个称为“蒸馏”的训练过">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-06-22T13:12:32.815Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/01/20/knowledge-distillation/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>knowledge distillation | 讲个笑话</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">讲个笑话</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">能力随心，自然成长</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-paper">
+
+    <a href="/paper/" rel="section"><i class="fa fa-fw fa-file-text"></i>论文</a>
+
+  </li>
+        <li class="menu-item menu-item-feeling">
+
+    <a href="/feeling/" rel="section"><i class="fa fa-fw fa-pencil"></i>随笔</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/01/20/knowledge-distillation/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+      <meta itemprop="name" content="mchen">
+      <meta itemprop="description" content="天青色等烟雨，而我在等你">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="讲个笑话">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          knowledge distillation
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-01-20 15:24:04" itemprop="dateCreated datePublished" datetime="2021-01-20T15:24:04+08:00">2021-01-20</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-22 21:12:32" itemprop="dateModified" datetime="2021-06-22T21:12:32+08:00">2021-06-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Distillation/" itemprop="url" rel="index">
+                    <span itemprop="name">Distillation</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>训练和部署两个阶段对模型的要求是不同的。在训练阶段，我们希望模型可以从大量的、高度冗余的信息中学到数据的特征，此阶段对延迟和计算资源没有太严格的要求。但是如果模型要被部署到大量用户那里，对延迟和计算资源的限制就很高。因此，我们可以先训练一个大模型。这个大模型可以是很多独立模型的集成，也可以是单个的使用了Dropout等正则化方法的复杂模型。在大模型训练好之后，我们就可以使用一个称为<strong>“蒸馏”</strong>的训练过程，将大模型中的知识迁移到便于部署的小模型中。</p>
+<a id="more"></a>
+<p> 知识蒸馏，可以将一个网络的知识转移到另一个网络，两个网络可以是同构或者异构。做法是先训练一个teacher网络，然后使用这个teacher网络的输出和数据的真实标签去训练student网络。知识蒸馏，可以用来将网络从大网络转化成一个小网络，并保留接近于大网络的性能；也可以将多个网络的学到的知识转移到一个网络中，使得单个网络的性能接近emsemble的结果。  知识蒸馏的本质，个人理解，<strong>其实知识蒸馏实际相当于引入先验概率（prior knowledge)</strong>， soft label即是网络输入的先验概率，soft label与真实世界的事物类似，呈各种概率分布。 </p>
+<p>  我们通过小的模型去学习大的模型的直接输出，往往能够得到更好的结果，这是因为大的模型的信息熵比onehot的结果往往更多，小的模型能获得的信息量更大。 <strong>使用知识蒸馏得到的小模型，其泛化能力会比使用一般方法训练得到的小模型要好。</strong> </p>
+<h3 id="基于bert的知识蒸馏"><a href="#基于bert的知识蒸馏" class="headerlink" title="基于bert的知识蒸馏"></a>基于bert的知识蒸馏</h3><ul>
+<li><p><strong>DistillBert</strong></p>
+<ul>
+<li><p>teacher model: bert</p>
+</li>
+<li><p>student model改动：</p>
+<ul>
+<li><p>每2层去掉1层（作者调研后结果是隐藏层维度的变化比层数的变化对计算性能的影响较小，所以只改变了层数，把计算层数减小到原来的一半）</p>
+</li>
+<li><p>去掉了token type embedding和pooler</p>
+</li>
+</ul>
+</li>
+<li><p>每一层加了初始化，每一层的初始化为teacher model的参数。 </p>
+</li>
+<li><p>在训练过程中使用了<strong>动态掩码</strong>（dynamic masking）然后没有使用next sentence objective。训练数据和原始的Bert训练使用的一样。 </p>
+</li>
+<li><p>loss设计：</p>
+<ul>
+<li>Lce loss:  Teacher model的soft label的损失函数， Teacher model的logits ti/T(T 为温度),通过softmax计算输出得到teacher的概率分布，与student model logits si/T(T为温度)，通过softmax计算输出得到student的概率分布，最后计算两个概率分布的KL散度 </li>
+<li><p>Lmlm loss: Bert的Mask language modeling loss( 单词级别分类任务 )</p>
+</li>
+<li><p>Lcos loss:  计算teacher hidden state和student hidden state的余弦相似度。官方代码用的是：nn.CosineEmbeddingLoss</p>
+<p>整体的loss：Loss = 5.0*Lce + 2.0*Lmlm + 1.0*Lcos</p>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<ul>
+<li><p><strong>Bert-PKD</strong></p>
+<p>普通的知识蒸馏模型用来对模型进行压缩的时候, 通常都会损失很多精度。原因是学生模型 (student model) 在学习的时候只是学到了教师模型 (teacher model) 最终预测的概率分布，而完全忽略了中间隐藏层的表示。  该方法提出了一种损失函数，使得学生模型的隐藏层表示接近教师模型的隐藏层表示，从而让学生模型的泛化能力更强。文章称这种模型为“耐心的知识蒸馏”模型 (Patient Knowledge Distillation， 或者PKD)。 </p>
+<ul>
+<li><p>teacher model：bert</p>
+</li>
+<li><p>student model改动：</p>
+<ul>
+<li><strong>蒸馏模型的中间层：</strong> PKD-last(7,8,9,10,11)  PKD-skip(2,4,6,8,10)</li>
+<li><strong>student初始化：</strong>teacher的前几层</li>
+</ul>
+</li>
+<li><p>loss设计</p>
+<ul>
+<li>中间层损失L_PT (MSE)</li>
+<li>真实标签损失L_CE (CE)</li>
+<li>student和teacher之间的损失L_DS (temperature softmax)</li>
+</ul>
+<p>LOSS = (1-a)*L_CE + a*L_DS + L_PT</p>
+</li>
+</ul>
+</li>
+<li><p><strong>TinyBert</strong></p>
+<p>一般的蒸馏只是蒸馏bert的最后一层的结果，而很少关注transformer中间层的信息</p>
+<ul>
+<li><p>loss设计</p>
+<ul>
+<li><p><strong>Embedding-layer </strong></p>
+<p>student和teacher的embedding之间计算MSE</p>
+</li>
+<li><p><strong>Transformer-layer </strong> <strong>采用隔 k 层蒸馏的方式 </strong></p>
+<p>若设置student BERT的层数为4，则teacher的第3、6、9、12分别对应student的1、2、3、4层</p>
+<p>每一层的transformer的loss又包含2个部分：</p>
+<ul>
+<li><p><strong>attention based distillation</strong></p>
+<p>对attention score矩阵(n*n)计算MSE</p>
+<p>（attention可以学到句子的语法相关信息，并且[CLS],[SEP]等token有很高的权重）</p>
+</li>
+<li><p><strong>hidden states based distillation</strong></p>
+<p>student和teacher的transformer的隐层输出计算MSE</p>
+</li>
+</ul>
+</li>
+<li><p><strong>Prediction-Layer </strong></p>
+<p>​        student和teacher输出概率分布的交叉熵</p>
+</li>
+</ul>
+</li>
+<li><p>实验细节   <strong>两阶段学习框架 </strong></p>
+<p>TinyBERT 先在 general domain 数据集上用未经微调的 BERT 充当教师蒸馏出一个 base 模型，在此基础上，具体任务通过数据增强，利用微调后的 BERT 再进行重新执行蒸馏。</p>
+<p>蒸馏 TinyBERT 的流程是:</p>
+<ol>
+<li>制作任务相关数据集;</li>
+<li>fine-tune teacher BERT;</li>
+<li>固定 teacher BERT 参数，蒸馏得到 TinyBERT.</li>
+</ol>
+</li>
+</ul>
+</li>
+</ul>
+<h3 id="Reference"><a href="#Reference" class="headerlink" title="Reference"></a>Reference</h3><p><a href="https://arxiv.org/abs/1910.01108" target="_blank" rel="noopener">DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter</a></p>
+<p><a href="https://arxiv.org/abs/1908.09355" target="_blank" rel="noopener">Patient Knowledge Distillation for BERT Model Compression </a></p>
+<p><a href="https://arxiv.org/abs/1909.10351" target="_blank" rel="noopener">TinyBERT: Distilling BERT for Natural Language Understanding</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/94359189" target="_blank" rel="noopener">比 Bert 体积更小速度更快的 TinyBERT</a></p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/NLP/" rel="tag"><i class="fa fa-tag"></i> NLP</a>
+              <a href="/tags/distillation/" rel="tag"><i class="fa fa-tag"></i> distillation</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/01/20/Transformer/" rel="prev" title="Transformer">
+      <i class="fa fa-chevron-left"></i> Transformer
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/01/PLMs/" rel="next" title="预训练语言模型相关">
+      预训练语言模型相关 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#基于bert的知识蒸馏"><span class="nav-number">1.</span> <span class="nav-text">基于bert的知识蒸馏</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Reference"><span class="nav-number">2.</span> <span class="nav-text">Reference</span></a></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mchen"
+      src="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+  <p class="site-author-name" itemprop="name">mchen</p>
+  <div class="site-description" itemprop="description">天青色等烟雨，而我在等你</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaomindog" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaomindog" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1131651415@qq.com" title="E-Mail → mailto:1131651415@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+
+<div class="copyright">
+
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mchen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+-->
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

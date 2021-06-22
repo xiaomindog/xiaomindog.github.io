@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('http://yoursite.com').hostname,
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.6.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}}
+  };
+</script>
+
+  <meta name="description" content="本文整理面试中可能出现的一些机器学习相关问题，以备记忆。">
+<meta name="keywords" content="ML">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习细节的知识点">
+<meta property="og:url" content="http:&#x2F;&#x2F;yoursite.com&#x2F;2021&#x2F;03&#x2F;08&#x2F;ml-base&#x2F;index.html">
+<meta property="og:site_name" content="讲个笑话">
+<meta property="og:description" content="本文整理面试中可能出现的一些机器学习相关问题，以备记忆。">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2021-06-22T13:12:32.815Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="http://yoursite.com/2021/03/08/ml-base/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>机器学习细节的知识点 | 讲个笑话</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">讲个笑话</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">能力随心，自然成长</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-paper">
+
+    <a href="/paper/" rel="section"><i class="fa fa-fw fa-file-text"></i>论文</a>
+
+  </li>
+        <li class="menu-item menu-item-feeling">
+
+    <a href="/feeling/" rel="section"><i class="fa fa-fw fa-pencil"></i>随笔</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2021/03/08/ml-base/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+      <meta itemprop="name" content="mchen">
+      <meta itemprop="description" content="天青色等烟雨，而我在等你">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="讲个笑话">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          机器学习细节的知识点
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2021-03-08 20:47:19" itemprop="dateCreated datePublished" datetime="2021-03-08T20:47:19+08:00">2021-03-08</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2021-06-22 21:12:32" itemprop="dateModified" datetime="2021-06-22T21:12:32+08:00">2021-06-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML/" itemprop="url" rel="index">
+                    <span itemprop="name">ML</span>
+                  </a>
+                </span>
+                  ，
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/ML/%E5%AE%9E%E4%B9%A0/" itemprop="url" rel="index">
+                    <span itemprop="name">实习</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>本文整理面试中可能出现的一些机器学习相关问题，以备记忆。</p>
+<a id="more"></a>
+<h3 id="BN"><a href="#BN" class="headerlink" title="BN"></a>BN</h3><p><strong>1. BN使得网络中每层输入数据的分布相对稳定，加速模型学习速度</strong></p>
+<p>​    BN通过规范化与线性变换使得每一层网络的输入数据的均值与方差都在一定范围内，使得后一层网络不必不断去适应底层网络中输入的变化，从而实现了网络中层与层之间的解耦，允许每一层进行独立学习，有利于提高整个神经网络的学习速度。</p>
+<p><strong>2. BN使得模型对网络中的参数不那么敏感，简化调参过程，使得网络学习更加稳定</strong></p>
+<p><strong>3. BN允许网络使用饱和性激活函数（例如sigmoid，tanh等），缓解梯度消失问题</strong></p>
+<p><strong>4. BN具有一定的正则化效果</strong></p>
+<p>​    在Batch Normalization中，由于我们使用mini-batch的均值与方差作为对整体训练样本均值与方差的估计，尽管每一个batch中的数据都是从总体样本中抽样得到，但不同mini-batch的均值与方差会有所不同，这就为网络的学习过程中增加了随机噪音，与Dropout通过关闭神经元给网络训练带来噪音类似，在一定程度上对模型起到了正则化的效果。</p>
+<p>BN 比较适用的场景是：每个 mini-batch 比较大，数据分布比较接近。在进行训练之前，要做好充分的 shuffle. 否则效果会差很多。</p>
+<p><strong>不适用于 动态的网络结构 和 RNN 网络。</strong></p>
+<p><a href="https://zhuanlan.zhihu.com/p/34879333" target="_blank" rel="noopener">Batch Normalization原理与实战</a></p>
+<p><a href="https://zhuanlan.zhihu.com/p/55852062" target="_blank" rel="noopener">Batch Normalization（BN，批量归一化）</a></p>
+<h3 id="LN"><a href="#LN" class="headerlink" title="LN"></a>LN</h3><p>针对 BN 的上述不足而提出的。它综合考虑一层所有维度的输入，计算该层的平均输入值和输入方差，然后用同一个规范化操作来转换各个维度的输入。</p>
+<p>LN 针对单个训练样本进行，不依赖于其他数据，因此可以避免 BN 中受 mini-batch 数据分布影响的问题，可以用于 小mini-batch场景、动态网络场景和 RNN，特别是自然语言处理领域。此外，LN 不需要保存 mini-batch 的均值和方差，节省了额外的存储空间。</p>
+<p><a href="https://zhuanlan.zhihu.com/p/33173246" target="_blank" rel="noopener">详解深度学习中的Normalization，BN/LN/WN</a></p>
+<h3 id="L1-L2正则化"><a href="#L1-L2正则化" class="headerlink" title="L1/L2正则化"></a>L1/L2正则化</h3><ul>
+<li>L1正则化可以产生稀疏权值矩阵，即产生一个稀疏模型，可以用于特征选择</li>
+<li><p>L2正则化可以防止模型过拟合（overfitting）；一定程度上，L1也可以防止过拟合</p>
+</li>
+<li><p>L1正则化是指权值向量w w<em>w</em>中各个元素的<strong>绝对值之和</strong>，通常表示为||W1||</p>
+</li>
+<li>L2正则化是指权值向量w中各个元素的<strong>平方和然后再求平方根</strong></li>
+</ul>
+<p>L1和L2的目的是通过减少W的权重<strong>(权重衰减)</strong>从而减少模型的复杂度，从而提高模型的泛华能力。</p>
+<p>正则化系数：通常越大的λ可以让代价函数在参数为0时取到最小值。</p>
+<p><a href="https://blog.csdn.net/jinping_shi/article/details/52433975" target="_blank" rel="noopener">机器学习中正则化项L1和L2的直观理解</a></p>
+<h3 id="偏差-方差"><a href="#偏差-方差" class="headerlink" title="偏差 方差"></a>偏差 方差</h3><p>偏差：描述预测和目标之间的差异</p>
+<p>方差：数据自身的分布</p>
+<ul>
+<li>欠拟合 偏差大方差小</li>
+<li>过拟合 偏差小 方差大</li>
+</ul>
+<p>如何解决？ 选择正确的模型，合适的模型复杂度，慎重选择数据集的大小</p>
+<h3 id="如何理解反向传播-解释action机制"><a href="#如何理解反向传播-解释action机制" class="headerlink" title="如何理解反向传播 解释action机制"></a>如何理解反向传播 解释action机制</h3><h3 id="激活函数的意义"><a href="#激活函数的意义" class="headerlink" title="激活函数的意义"></a>激活函数的意义</h3><p>引入激活函数是为了<strong>增加神经网络模型的非线性</strong>。没有激活函数的每层都相当于矩阵相乘。即使叠加了若干层之后，无非还是个矩阵相乘。</p>
+<p>性质：</p>
+<p>非线性，可微性，单调性，f(x)约等于x，输出值的范围</p>
+<ul>
+<li>非饱和性：饱和指的是在某些区间梯度接近于零（即梯度消失），使得参数无法继续更新的问题</li>
+</ul>
+<p>RELU: 计算快(f(x)=max(0,x))</p>
+<p>sigmoid,tanh</p>
+<p>结合3者图像理解：</p>
+<p>relu不容易梯度消失，relu的梯度大多数情况下是常数，有助于解决深层网络的收敛问题。</p>
+<p>在LSTM中使用Relu作为激活函数：</p>
+<p>​    RNN中共享参数W，很容易出现很大的输出值。</p>
+<p>​    Relu不能解决梯度长距离的传递问题。</p>
+<h3 id="梯度消失和梯度爆炸"><a href="#梯度消失和梯度爆炸" class="headerlink" title="梯度消失和梯度爆炸"></a>梯度消失和梯度爆炸</h3><p>梯度消失：导数小于1，随着网络成熟变多，梯度更新信息指数衰减</p>
+<p>梯度爆炸：导数大于1，随着网络成熟变多，梯度更新信息指数增加</p>
+<p>解决方案：</p>
+<ol>
+<li>梯度裁剪</li>
+<li>relu激活函数</li>
+<li>BN</li>
+<li>残差结构等</li>
+</ol>
+<h3 id="Dropout的原理"><a href="#Dropout的原理" class="headerlink" title="Dropout的原理"></a>Dropout的原理</h3><p>神经网络在训练时，每层的迭代过程中， 随机选择中的一些神经元并将其临时隐藏(丢弃)，然后再进行本次训练和优化。 下一次迭代重复操作，以至训练结束。<strong>由于是随机丢弃，每一个mini-batch都在训练不同的网络。</strong></p>
+<p> 在训练时，每个神经单元以概率p被保留(Dropout丢弃率为1−p)；在测试阶段，每个神经单元都是存在的，权重参数w要乘以p，输出是：pw。 </p>
+<h3 id="神经网络相关的"><a href="#神经网络相关的" class="headerlink" title="神经网络相关的"></a>神经网络相关的</h3><h4 id="LSTM的参数如何计算"><a href="#LSTM的参数如何计算" class="headerlink" title="LSTM的参数如何计算"></a>LSTM的参数如何计算</h4><p>4个参数计算 具体见公式</p>
+<p>sum = 4*((dim+hidden)+hidden)</p>
+<p>GRU应该是LSTM参数的3/4</p>
+<h4 id="有哪些优化器"><a href="#有哪些优化器" class="headerlink" title="有哪些优化器"></a>有哪些优化器</h4><ul>
+<li>SGD 最基础的 </li>
+<li>动量法</li>
+<li>自适应学习率法 （减少梯度下降中的摆动）</li>
+<li>Adam = 动量法+自适应学习率</li>
+<li>AdamW 约等于 Adam+L2正则化 </li>
+</ul>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/ML/" rel="tag"><i class="fa fa-tag"></i> ML</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2021/03/01/microsoft-work-organization/" rel="prev" title="微软实习内容简单梳理">
+      <i class="fa fa-chevron-left"></i> 微软实习内容简单梳理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2021/03/16/sortArry/" rel="next" title="手撕排序之堆排序">
+      手撕排序之堆排序 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#BN"><span class="nav-number">1.</span> <span class="nav-text">BN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LN"><span class="nav-number">2.</span> <span class="nav-text">LN</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#L1-L2正则化"><span class="nav-number">3.</span> <span class="nav-text">L1/L2正则化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#偏差-方差"><span class="nav-number">4.</span> <span class="nav-text">偏差 方差</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何理解反向传播-解释action机制"><span class="nav-number">5.</span> <span class="nav-text">如何理解反向传播 解释action机制</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#激活函数的意义"><span class="nav-number">6.</span> <span class="nav-text">激活函数的意义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#梯度消失和梯度爆炸"><span class="nav-number">7.</span> <span class="nav-text">梯度消失和梯度爆炸</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Dropout的原理"><span class="nav-number">8.</span> <span class="nav-text">Dropout的原理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#神经网络相关的"><span class="nav-number">9.</span> <span class="nav-text">神经网络相关的</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#LSTM的参数如何计算"><span class="nav-number">9.1.</span> <span class="nav-text">LSTM的参数如何计算</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#有哪些优化器"><span class="nav-number">9.2.</span> <span class="nav-text">有哪些优化器</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="mchen"
+      src="https://gss0.baidu.com/94o3dSag_xI4khGko9WTAnF6hhy/zhidao/wh%3D600%2C800/sign=8beb6236895494ee8777071f1dc5ccc6/6159252dd42a28344caed5825eb5c9ea15cebf2b.jpg">
+  <p class="site-author-name" itemprop="name">mchen</p>
+  <div class="site-description" itemprop="description">天青色等烟雨，而我在等你</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">28</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">15</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">27</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/xiaomindog" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;xiaomindog" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="mailto:1131651415@qq.com" title="E-Mail → mailto:1131651415@qq.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+      </span>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+
+
+<div class="copyright">
+
+  
+  &copy; 
+  <span itemprop="copyrightYear">2021</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">mchen</span>
+</div>
+<!--
+  <div class="powered-by">由 <a href="https://hexo.io/" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v4.0.0
+  </div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org/" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.6.0
+  </div>
+-->
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/pisces.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
